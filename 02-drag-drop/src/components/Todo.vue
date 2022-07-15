@@ -1,26 +1,20 @@
 <script setup>
-import { reactive, ref } from "vue";
+import { onMounted, ref, reactive } from "vue";
+import InputNew from "./InputNew.vue";
 
 const count = ref(0);
-const boards = ref([
+let boards = reactive([
   {
     id: crypto.randomUUID(),
     name: "board-1",
-    newValue: "",
     items: [{ id: crypto.randomUUID(), title: "Hola a todos" }],
   },
   {
     id: crypto.randomUUID(),
     name: "board-2",
-    newValue: "",
     items: [{ id: crypto.randomUUID(), title: "Hola a todos 2" }],
   },
 ]);
-
-function increment() {
-  count.value++;
-}
-
 function startDrag(evt, boardId, itemId) {
   console.log(boardId, itemId);
   evt.dataTransfer.dropEffect = "move";
@@ -30,23 +24,27 @@ function startDrag(evt, boardId, itemId) {
 function onDrop(evt, dest) {
   const { boardId, itemId } = JSON.parse(evt.dataTransfer.getData("item"));
   console.log({ boardId, itemId });
-  const board = boards.value.find((board) => board.id === boardId);
+  const board = boards.find((board) => board.id === boardId);
   const item = board.items.find((item) => item.id === itemId);
-  dest.items.push({ ...item });
   board.items = board.items.filter((i) => i.id !== item.id);
+  dest.items.push({ ...item });
 }
 
-function handleChange(evt, board) {
-  const value = evt.target.value;
-
-  board.newValue = value;
+function handleNewItem(text, board) {
+  console.log(text.value);
+  board.items.push({ id: crypto.randomUUID(), title: text.value });
 }
 
-function handleKeyDown(evt, board) {
-  if (evt.key === "Enter") {
-    const value = board.newValue;
-    console.log(board.newValue);
-    board.items.push({ id: crypto.randomUUID(), title: value });
+function createNewBoard() {
+  const name = prompt("Name of board");
+  if (name) {
+    const board = {
+      id: crypto.randomUUID(),
+      name: name,
+      items: [],
+    };
+
+    boards.push(board);
   }
 }
 </script>
@@ -55,7 +53,7 @@ function handleKeyDown(evt, board) {
   <div>
     <nav>
       <ul>
-        <li><a href="#">Create list</a></li>
+        <li><a href="#" @click="createNewBoard">Create list</a></li>
       </ul>
     </nav>
 
@@ -71,11 +69,7 @@ function handleKeyDown(evt, board) {
         >
           {{ board.name }}
           <div class="input">
-            <input
-              type="text"
-              @input="handleChange($event, board)"
-              @keydown="handleKeyDown($event, board)"
-            />
+            <InputNew @on-new-item="(text) => handleNewItem(text, board)" />
           </div>
           <div
             class="item drag-el"
