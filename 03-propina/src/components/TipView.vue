@@ -4,8 +4,14 @@ import PeopleView from "./PeopleView.vue";
 </script>
 
 <template>
-  <InputForm />
-  <PeopleView />
+  <div class="container">
+    <InputForm />
+    <PeopleView />
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.container {
+  display: flex;
+}
+</style>

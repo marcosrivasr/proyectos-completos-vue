@@ -15,6 +15,7 @@ export function getGrandTotal() {
 }
 
 export function calculate() {
+  store.people = [];
   const total = store.params.total;
   const tip = store.params.tip;
   const people = store.params.people;
@@ -22,6 +23,7 @@ export function calculate() {
   console.log(store.params);
   const totalPerPerson = (total * (tip / 100 + 1)) / people;
   store.params.remaining = total;
+
   for (let i = 0; i < people; i++) {
     store.people.push({
       id: crypto.randomUUID(),
